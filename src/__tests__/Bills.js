@@ -15,9 +15,15 @@ import router from "../app/Router.js";
 // import app/store.js and then link to mockStore
 jest.mock("../app/Store.js", () => mockStore);
 
+// arrow function to navigate to the right path (second parameter in Bills)
+const onNavigate = (pathname) => {
+  document.body.innerHTML = ROUTES({ pathname });
+};
+
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
+      // configure locastorage to be in employee mode
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -35,7 +41,7 @@ describe("Given I am connected as an employee", () => {
       // icon-window from folder views > file VerticalLayout.js
       await waitFor(() => screen.getByTestId("icon-window"));
       const windowIcon = screen.getByTestId("icon-window");
-      //to-do write expect expression
+      
       //active-icon from folder app > file Router.js
       expect(windowIcon.classList).toContain("active-icon");
     });
@@ -55,38 +61,19 @@ describe("Given I am connected as an employee", () => {
       // Are the bills ordered as requested ?
       expect(dates).toEqual(datesSorted);
     });
-    // test("Then if there is no Bill no bill should be displayed", () => {
-    //   // BillsUI est vide
-    //   document.body.innerHTML = BillsUI({ data: [] })
-    //   //icon-eye from the views folder > file Actions.js to allow the use to access the url in the bill when clicking the blue eye
-    //   const iconEye = screen.queryByTestId('icon-eye')
-    //   // no blue eyes are present on the page (the one we can click to see the document in the note)
-    //   expect(iconEye).toBeNull()
-    // })
-    // test('Then if there is one bill or more it should be displayed', () => {
-    //   // ----- Bills UI contient des données ----- //
-    //   document.body.innerHTML = BillsUI({ data: bills })
-    //   const iconEyes = screen.getAllByTestId('icon-eye')
-    //   //at least one blue eye present on the page (the one we can click to see the document in the note)
-    //   expect(iconEyes.length).toBeGreaterThanOrEqual(1)
-    // })
 
     
     // test to make sure an new bill open when we click "Nouvelle note de frais" button
 
     describe('When I click on the button "Nouvelle note de frais"', () => {
       test("Then the New Bill menu should appear", async () => {
-        // arrow function to navigate to the right path (second parameter in Bills)
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname });
-        };
 
         // new const that equals a new Bills from the constructor from container > bills.js with the properties store and localStorage set to null
         const bills = new Bills({
           document,
           onNavigate,
           store: null,
-          localStorage: null,
+          localStorage: window.localStorage,
         });
 
         // creation of a mock function with jest.fn taking a function that's going to be called in an addeventlistener ( https://www.pluralsight.com/guides/how-does-jest.fn()-work )
@@ -120,24 +107,18 @@ describe("Given I am connected as an employee", () => {
         const html = BillsUI({ data: bills });
         document.body.innerHTML = html;
 
-        // arrow function to navigate to the right path (second parameter in Bills)
-        const onNavigate = (pathname) => {
-          document.body.innerHTML = ROUTES({ pathname });
-        };
-
         // new const that equals a new Bills from the constructor from container > bills.js with the properties store and localStorage set to null
         const testingBills = new Bills({
           document,
           onNavigate,
           store: null,
-          localStorage: null,
+          localStorage: window.localStorage,
         });
 
         // allow to access boostrap modal from the folder views -> BillsUI.js file without getting the error "TypeError: $(...).modal is not a function"
         // $ stands for Jquery (it's the shortcut for jquery so you can write jQuery.fn.modal = jest.fn() or $.fn.modal = jest.fn() interchangeably)
         // link that help me to find the solution ( https://stackoverflow.com/questions/45225235/accessing-bootstrap-functionality-in-jest-testing )
         jQuery.fn.modal = jest.fn();
-
         // get button from HTML
         const iconEyes = screen.getAllByTestId("icon-eye");
 
@@ -164,6 +145,12 @@ describe("Given I am connected as an employee", () => {
 });
 
 // test d'intégration GET
+
+// GET est particulièrement bien adapté pour personnaliser les sites Web : 
+// les recherches des utilisateurs, les paramètres de filtrage et le tri des listes 
+// peuvent être mis en marque-page avec l’URL, de sorte qu’à la 
+// prochaine visite du site, l’utilisateur retrouvera la page telle qu’il l’a laissée.
+
 // change dashboard to bills and admin to employee
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills", () => {
@@ -177,7 +164,7 @@ describe("Given I am a user connected as Employee", () => {
       document.body.append(root);
       router();
       window.onNavigate(ROUTES_PATH.Bills);
-      // change text with "Mes notes de frais"
+      // changed text with "Mes notes de frais" (instead of what was written)
       await waitFor(() => screen.getByText("Mes notes de frais"));
       // make sure at least one bill is recovered
       expect(screen.getByTestId("tbody").childElementCount).toBeGreaterThan(1);
@@ -185,6 +172,7 @@ describe("Given I am a user connected as Employee", () => {
     describe("When an error occurs on API", () => {
       beforeEach(() => {
         jest.spyOn(mockStore, "bills");
+          // configure locastorage to be in employee mode
         Object.defineProperty(window, "localStorage", {
           value: localStorageMock,
         });
