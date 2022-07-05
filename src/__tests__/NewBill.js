@@ -86,17 +86,100 @@ describe("Given I am connected as an employee", () => {
       // add what is expected to happen
       expect(handleChangeFile).toBeCalled();
       expect(inputFile.files[0].name).toBe("funnyCat.gif");
-      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy()
-      
-      // Error div added in container > newBill and hidden in css. 
+      expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
+
+      // Error div added in container > newBill and hidden in css.
       // It will show if the file tested is not an acceped format
-      const error = screen.getByTestId('error-file')
+      const error = screen.getByTestId("error-file");
       await waitFor(() => {
-        expect(error.classList).toHaveLength(1)
-    })
+        expect(error.classList).toHaveLength(1);
+      });
     });
   });
 });
+
+// cont to build a new note for test purposes
+const newNote = {
+  id: "HMIErt34fuYo08rtd",
+  status: "refused",
+  pct: 20,
+  amount: 400,
+  email: "hello@bye.com",
+  name: "hello world",
+  vat: "50",
+  fileName: "hello-world.jpg",
+  date: "2007-05-06",
+  commentAdmin: "hello world",
+  commentary: "test hello world",
+  type: "world",
+  fileUrl: "https://localhost:3456/images/hello-world.jpg"
+};
+
+// Test to check if a bill is added and if undefine call updateBill.
+// then check if the bill is created and that you'e then redirected to bills
+describe('When I submit the newbill', () => {
+
+  // Test for dive into updateBill
+  test('Then add the newbill', async () => {
+
+   
+      // build UI for newBill
+      document.body.innerHTML = NewBillUI()
+
+      // Initiate the newBill form to test
+      const newBill = new NewBill({
+          document,
+          onNavigate,
+          store: null,
+          localStorage: window.localStorage,
+      })
+
+      // if it's undefined then call updateBill
+      expect(newBill.updateBill(newNote)).toBeUndefined()
+  })
+
+  test('Then create Bill with input fields correctly completed and redirect to Bills', async () => {
+
+      // create a new bill form
+      document.body.innerHTML = NewBillUI()
+
+      // Initiate the newBill form to test
+      const newBill = new NewBill({
+          document,
+          onNavigate,
+          store: mockStore,
+          localStorage: window.localStorage,
+      })
+
+      newBill.updateBill = (bill) => bill
+
+      // complete all input fields of the form
+      document.querySelector(`select[data-testid="expense-type"]`).value = newNote.type
+      document.querySelector(`input[data-testid="expense-name"]`).value = newNote.name
+      document.querySelector(`input[data-testid="amount"]`).value = newNote.amount
+      document.querySelector(`input[data-testid="datepicker"]`).value = newNote.date
+      document.querySelector(`input[data-testid="vat"]`).value = newNote.vat
+      document.querySelector(`input[data-testid="pct"]`).value = newNote.pct
+      document.querySelector(`textarea[data-testid="commentary"]`).value = newNote.commentary
+      newBill.fileUrl = newNote.fileUrl
+      newBill.fileName = newNote.fileName
+
+      // Get the form from data-testid
+      const submit = screen.getByTestId('form-new-bill')
+
+      // Add event listener Submit on form and fire
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
+      submit.addEventListener('click', handleSubmit)
+      userEvent.click(submit)
+      expect(handleSubmit).toHaveBeenCalled()
+      expect(screen.queryAllByText('Vous devez entrer un titre')).toHaveLength(0)
+      // make sure that the btn-new-bill and "mes notes de frais" are visible
+      // so we know we're back on bill page
+      expect(screen.getByTestId('btn-new-bill')).toBeVisible()
+      expect(screen.getByText('Mes notes de frais')).toBeVisible()
+  })
+})
+
 
 // API POST
 // POST est presque toujours favorisé lorsque l’utilisateur doit

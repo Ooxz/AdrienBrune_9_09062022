@@ -1,0 +1,58 @@
+Plan de test End-to-End du parcours employé
+
+Scénario 1
+Given Je suis un visiteur (non connecté)
+When Je ne remplis pas le champ e-mail ou le champ password du login employé et je clique sur le bouton Se connecter
+Then Je reste sur la page Login et je suis invité à remplir le champ manquant
+
+Scénario 2
+Given Je suis un visiteur (non connecté)
+When Je remplis le champ e-mail du login employé au mauvais format (sans la forme chaîne@chaîne) et je clique sur le bouton Se connecter
+Then Je reste sur la page Login et je suis invité à remplir le champ e-mail au bon format
+
+Scénario 4
+Given Je suis connecté en tant qu’Employé
+When Je visite la page Mes notes de frais
+Then Pour chaque note de frais, je peux lire le type, le nom, la date, le montant et le statut Scénario 5
+Given Je suis connecté en tant qu’Employé et je suis sur la page Mes notes de frais
+When Je clique sur l’icône d’oeil à droite d’une note de frais
+Then Une modale s’ouvre et l’image du justificatif apparaît à l’intérieur
+
+Scénario 6
+Given Je suis connecté en tant qu’Employé et je suis sur la page Mes notes de frais
+When Je suis dans la modale du justificatif et je clique en dehors ou sur l'icône de croix
+Then La modale se ferme et je suis de nouveau sur la page Mes notes de frais
+
+Scénario 7
+Given Je suis connecté en tant qu’Employé et je suis sur la page Mes notes de frais When Je viens de fermer une modale de justificatif, je suis de nouveau sur la page Mes notes de frais et je clique sur l'icône oeil d’une autre note de frais
+Then Une modale s’ouvre et un nouvelle image de justificatif apparaît à l’intérieur
+
+Scénario 8
+Given Je suis connecté en tant qu’Employé et je suis sur la page Mes notes de frais
+When Je clique sur le bouton Nouvelle note de frais
+Then J’arrive sur la page “Envoyer une note de frais”, un formulaire avec 8 champs et un bouton “Envoyer” est visible
+
+Scénario 9
+Given Je suis connecté en tant qu’Employé et je suis sur la page Envoyer une note de frais
+When Je laisse le formulaire vide et je clique sur le bouton Envoyer
+Then Une bulle de dialogue me demande de remplir les champs obligatoires
+
+Scénario 10
+Given Je suis connecté en tant qu’Employé et je suis sur la page Envoyer une note de frais
+When J’envoie un fichier qui n’est pas du bon format
+Then Le fichier n'est pas accepté et rien ne se passe tant qu'un fichier du bon format est rentré. Si je clique sur envoyer une bulle apparait me signalant que je n'ai rien sélectionné 
+
+Scénario 11
+Given Je suis connecté en tant qu’Employé et je suis sur la page Envoyer une note de frais
+When Je remplis le formulaire correctement et je clique sur le bouton Envoyer
+Then La page Nouvelle note de frais se ferme, je suis de retour sur la page Mes notes de frais, et la nouvelle note de frais apparait comme En Attente
+
+Scénario 12
+Given Je suis connecté en tant qu’Employé et je suis sur la page Mes notes de frais
+When Je clique sur le bouton Retour en arrière de la navigation
+Then Je reste sur la page Mes notes de frais
+
+Scénario 13
+Given Je suis connecté en tant qu’Employé et je suis sur la page Mes notes de frais
+When Je clique sur le bouton de déconnexion en bas à gauche
+Then Je suis de retour sur la page de connection en tant que visiteur (non connecté)
