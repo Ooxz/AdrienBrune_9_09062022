@@ -115,7 +115,7 @@ const newNote = {
   fileUrl: "https://localhost:3456/images/hello-world.jpg"
 };
 
-// Test to check if a bill is added and if undefine call updateBill.
+// Test to check if a bill is added and if undefined call updateBill.
 // then check if the bill is created and that you'e then redirected to bills
 describe('When I submit the newbill', () => {
 
